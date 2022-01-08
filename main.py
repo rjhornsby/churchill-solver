@@ -1,55 +1,54 @@
 #!/usr/bin/env python
 
 import pprint
+import pygame
+from pygame.locals import *
+import sys
 
 from game.table import CardTable
-print("starting")
+from lib.card import Card
 
-table = CardTable()
-table.deal()
 
-print(table.devils_six)
-print(table.play_piles)
-# print(table.draw_pile)
-pprint.pprint(table.possible_moves())
+#
+# print(table.devils_six)
+# print(table.play_piles)
+# # print(table.draw_pile)
+# # pprint.pprint(table.possible_moves())
+#
+# print(table.play_piles)
 
-# from tkinter import *
-# from tkinter import ttk
-# root = Tk()
-# root.title("Freedom Units to Communist Units")
-#
-#
-# def calculate(*args):
-#     try:
-#         value = float(feet.get())
-#         meters.set(int(0.3048 * value * 10000.0 + 0.5)/10000.0)
-#     except ValueError:
-#         pass
-#
-#
-# mainframe = ttk.Frame(root, padding="3 3 12 12")
-# mainframe.grid(column=0, row=0, sticky=(N, W, E, S))
-# root.columnconfigure(0, weight=1)
-# root.rowconfigure(0, weight=1)
-#
-# feet = StringVar()
-# feet_entry = ttk.Entry(mainframe, width=7, textvariable=feet)
-# feet_entry.grid(column=2, row=1, sticky=(W, E))
-#
-# meters = StringVar()
-# ttk.Label(mainframe, textvariable=meters).grid(column=2, row=2, sticky=(W, E))
-#
-# ttk.Button(mainframe, text="Calculate", command=calculate).grid(column=3, row=3, sticky=W)
-#
-# ttk.Label(mainframe, text="feet").grid(column=3, row=1, sticky=W)
-# ttk.Label(mainframe, text="is equivalent to").grid(column=1, row=2, sticky=E)
-# ttk.Label(mainframe, text="meters").grid(column=3, row=2, sticky=W)
-#
-# for child in mainframe.winfo_children():
-#     child.grid_configure(padx=5, pady=5)
-# feet_entry.focus()
-# root.bind("<Return>", calculate)
-#
-#
-# root.mainloop()
-#
+def main():
+    table = CardTable()
+    table.deal()
+    pygame.init()
+    screen = pygame.display.set_mode((900, 700))
+    pygame.display.set_caption('Churchill')
+    background = pygame.Surface(screen.get_size())
+    background = background.convert()
+    background.fill((25, 100, 25))
+
+    screen.blit(background, (0, 0))
+
+    card = table.play_piles[0].top_card
+    pretty_card = card.sprite
+    pretty_card.rect.center = screen.get_rect().center
+    group = pygame.sprite.Group(pretty_card)
+    group.draw(screen)
+
+    pygame.display.update()
+    pygame.display.flip()
+
+    while True:
+        for event in pygame.event.get():
+            if event.type == QUIT:
+                return
+
+        # screen.blit(background, (0, 0))
+        # card_images = load_card_images()
+        #
+        # surf.blit(card_images, (100, 100))
+        # pygame.display.flip()
+
+
+
+if __name__ == '__main__': main()

@@ -12,3 +12,13 @@ class CardStack(list[Card]):
             return self[-1]
         except ValueError:
             return None
+
+    @property
+    def bottom_card(self):
+        try:
+            return self[0]
+        except ValueError:
+            return None
+
+    def put_allowed(self, _: Card):
+        return NotImplemented

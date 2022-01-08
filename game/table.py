@@ -62,23 +62,55 @@ class CardTable:
         self.draw_pile = self.game_deck.copy()
         del self.game_deck
 
+    # Move cards from the draw pile onto the play piles
+    def draw(self):
+        for p in self.play_piles:
+            if not self.draw_pile: return
+            if p.bottom_card.value == Card.FaceCard.KING:
+                # skip piles that start with a king
+                continue
+            else:
+                p.append(self.next_card())
+                p.top_card.turn()
+
     def next_card(self):
-        next_card = self.game_deck.pop()
-        return next_card
+        if self.game_deck:
+            return self.game_deck.pop()
+        else:
+            return self.draw_pile.pop()
 
     def possible_moves(self):
+        moves = []
+        # from devils six to victory
+        # for v in self.victory_piles:
+        #     if v.put_allowed(self.devils_six.top_card):
+        #         moves.append([self.devils_six, v])
+        moves.extend(self.moves_d6_to_victory())
+        moves.extend(self.moves_play_to_victory())
+        moves.extend(self.moves_play_to_play())
+
+        return moves
+
+    def moves_d6_to_victory(self):
         moves = []
         # from devils six to victory
         for v in self.victory_piles:
             if v.put_allowed(self.devils_six.top_card):
                 moves.append([self.devils_six, v])
+        return moves
+
+    def moves_play_to_victory(self):
+        moves = []
         # from play to victory
         for p in self.play_piles:
             for v in self.victory_piles:
                 if v.put_allowed(p.top_card):
                     moves.append([p, v])
                     break  # only need to find one possible victory pile slot
-        # from play to play
+        return moves
+
+    def moves_play_to_play(self):
+        moves = []
         for p0 in self.play_piles:
             for p1 in self.play_piles:
                 if p0 == p1:
@@ -87,4 +119,3 @@ class CardTable:
                     moves.append([p0, p1, p0.top_card])
 
         return moves
-

@@ -1,4 +1,6 @@
 from enum import Enum, auto
+import pygame
+from pygame.locals import *
 
 class Card:
     class Suit(Enum):
@@ -27,6 +29,7 @@ class Card:
         self.suit = self.Suit(suit)
         self.value = value
         self.face_up = False
+        self._sprite = None
 
     def __str__(self):
         if not self.face_up:
@@ -67,9 +70,48 @@ class Card:
             return self.Color.BLACK
 
     @property
-    def is_facecard(self):
+    def is_facecard(self) -> bool:
         try:
             self.FaceCard(self.value)
             return True
         except ValueError:
             return False
+
+    @property
+    def sprite(self) -> pygame.sprite.Sprite:
+        if self._sprite is None:
+            if self.is_facecard:
+                self._sprite = self.Sprite(f"{self.FaceCard(self.value).name[0]}{self.suit_name[0]}")
+            else:
+                self._sprite = self.Sprite(f"{self.value}{self.suit_name[0]}")
+
+        return self._sprite
+
+    class Sprite(pygame.sprite.Sprite):
+        def __init__(self, card: str):
+            pygame.sprite.Sprite.__init__(self)
+            card = str.upper(card)
+            self.og_image = self.load_card_image(card)
+            self.image = self.og_image
+            self.rect = self.image.get_rect()
+            self.set_rounded(15)
+
+        def set_rounded(self, radius) -> None:
+            size = self.og_image.get_size()
+            rect_image = pygame.Surface(size, pygame.SRCALPHA)
+            pygame.draw.rect(rect_image, (255, 255, 255), (0, 0, *size), border_radius=radius)
+            self.image = self.og_image.copy().convert_alpha()
+            self.image.blit(rect_image, (0, 0), None, pygame.BLEND_RGBA_MIN)
+
+        @staticmethod
+        def load_card_image(card: str) -> pygame.image:
+            if len(card) != 2:
+                raise ValueError('Cannot load image. Card arg must be two characters only')
+            try:
+                image = pygame.image.load(f"assets/card_images/{card}.png")
+                image = pygame.transform.scale(image, (image.get_width() * 0.15, image.get_height() * 0.15))
+            except pygame.error as message:
+                print('Cannot load image')
+                raise SystemExit(message)
+
+            return image
