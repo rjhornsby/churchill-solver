@@ -25,7 +25,7 @@ class Deck(CardStack):
                     self.append(Card(suit, value))
 
     def load_dealpack(self):
-        with open('deal_packs/dealpack_1.json') as fh:
+        with open('assets/deal_packs/dealpack_1.json') as fh:
             data = json.load(fh)
             cards = data[int(self.GAME_NUMBER) - 1]['cards']
             print(cards)
